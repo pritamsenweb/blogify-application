@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('./partials/head') %>
+  <title>Create Account — Blogify</title>
+</head>
+<body>
+  <%- include('./partials/nav') %>
+
+  <main class="app-main">
+    <div class="auth-wrapper">
+      <div class="auth-card">
+        <div class="auth-header">
+          <div class="brand-icon mx-auto mb-3" style="width: 48px; height: 48px; font-size: 1.4rem;">
+            <i class="bi bi-feather"></i>
+          </div>
+          <h1 class="auth-title">Create Account</h1>
+          <p class="auth-subtitle">Join developers and writers publishing engineering stories and architectural insights.</p>
+        </div>
+
+        <% if (locals.error) { %>
+          <div class="alert-custom-danger mb-4 mt-0">
+            <i class="bi bi-exclamation-circle-fill"></i>
+            <div><%= locals.error %></div>
+          </div>
+        <% } %>
+
+        <form action="/user/signup" method="POST">
+          <!-- Full Name -->
+          <div class="mb-3">
+            <label for="fullName" class="form-label-custom">Full Name</label>
+            <div class="input-with-icon">
+              <i class="bi bi-person-fill input-icon-left"></i>
+              <input 
+                type="text" 
+                class="form-input-custom" 
+                id="fullName" 
+                name="fullName" 
+                value="<%= locals.fullName || '' %>"
+                placeholder="e.g. Alex Morgan" 
+                required 
+                autofocus
+              >
+            </div>
+          </div>
+
+          <!-- Email Address -->
+          <div class="mb-3">
+            <label for="email" class="form-label-custom">Email Address</label>
+            <div class="input-with-icon">
+              <i class="bi bi-envelope-fill input-icon-left"></i>
+              <input 
+                type="email" 
+                class="form-input-custom" 
+                id="email" 
+                name="email" 
+                value="<%= locals.email || '' %>"
+                placeholder="alex@example.com" 
+                required
+              >
+            </div>
+            <div class="text-muted small mt-1">We will never share or spam your email address.</div>
+          </div>
+
+          <!-- Password -->
+          <div class="mb-4">
+            <label for="password" class="form-label-custom">Password</label>
+            <div class="input-with-icon">
+              <i class="bi bi-lock-fill input-icon-left"></i>
+              <input 
+                type="password" 
+                class="form-input-custom" 
+                id="password" 
+                name="password" 
+                placeholder="Choose a strong password" 
+                required
+              >
+              <button type="button" class="password-toggle-btn" data-target="password" aria-label="Toggle password visibility">
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Submit -->
+          <button type="submit" class="btn-primary-custom mb-3">
+            <i class="bi bi-stars"></i>
+            <span>Create My Account</span>
+          </button>
+        </form>
+
+        <div class="text-center mt-3 pt-3 border-top border-secondary-subtle">
+          <p class="text-secondary small mb-0">
+            Already have an account? 
+            <a href="/user/signin" class="text-white fw-semibold text-decoration-underline ms-1">Sign in here</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <%- include('./partials/script') %>
+</body>
+</html>

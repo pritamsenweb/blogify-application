@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('./partials/head') %>
+  <title>Write a New Story — Blogify</title>
+</head>
+<body>
+  <%- include('./partials/nav') %>
+
+  <main class="app-main">
+    <div class="editor-container">
+      <a href="/" class="back-link">
+        <i class="bi bi-arrow-left"></i>
+        <span>Back to stories</span>
+      </a>
+
+      <div class="editor-card">
+        <div class="editor-header">
+          <span class="hero-badge mb-2"><i class="bi bi-pen-fill"></i> Publishing Studio</span>
+          <h1 class="editor-title">Create a New Story</h1>
+          <p class="editor-subtitle">
+            Share technical architecture, deep dives, product learnings, or creative perspectives with readers worldwide.
+          </p>
+        </div>
+
+        <form method="POST" action="/blog" enctype="multipart/form-data">
+          <!-- Story Title -->
+          <div class="mb-4">
+            <label for="title" class="form-label-custom">
+              <span>Story Title <span class="text-danger">*</span></span>
+              <span class="text-muted small fw-normal">Keep it catchy &amp; descriptive</span>
+            </label>
+            <input 
+              type="text" 
+              class="form-input-custom" 
+              id="title" 
+              name="title" 
+              placeholder="e.g. Architectural Deep Dive: Mastering Concurrency in Node.js" 
+              required
+              autofocus
+            >
+          </div>
+
+          <!-- Cover Image Drag & Drop with Live Preview -->
+          <div class="mb-4">
+            <label class="form-label-custom">
+              <span>Cover Photo</span>
+              <span class="text-muted small fw-normal">Optional &bull; PNG, JPG, WebP</span>
+            </label>
+
+            <!-- Dropzone -->
+            <div class="upload-dropzone" id="uploadDropzone">
+              <i class="bi bi-cloud-arrow-up upload-icon"></i>
+              <div class="upload-prompt">Click to select or drag &amp; drop your cover photo</div>
+              <div class="upload-sub">Supports 16:9 widescreen images up to 10MB</div>
+              <input 
+                type="file" 
+                class="upload-hidden-input" 
+                id="coverImgInput" 
+                name="coverImageURL" 
+                accept="image/*"
+              >
+            </div>
+
+            <!-- Live Preview Wrapper -->
+            <div class="upload-preview-wrapper" id="previewWrapper">
+              <img src="" alt="Preview Cover" class="upload-preview-img" id="previewImg">
+              <button type="button" class="btn-remove-preview" id="removePreviewBtn">
+                <i class="bi bi-trash3-fill me-1"></i> Remove photo
+              </button>
+            </div>
+          </div>
+
+          <!-- Story Content / Body -->
+          <div class="mb-4">
+            <div class="form-label-custom">
+              <span>Story Content <span class="text-danger">*</span></span>
+              <div class="d-flex align-items-center gap-3 text-muted small fw-normal">
+                <span id="editorWordCount"><i class="bi bi-fonts me-1"></i>0 words</span>
+                <span id="editorReadTime"><i class="bi bi-clock me-1"></i>~1 min read</span>
+              </div>
+            </div>
+            <textarea 
+              class="form-input-custom form-textarea-custom" 
+              id="body" 
+              name="body" 
+              placeholder="Write your story here... Separate paragraphs with an empty line. You can write technical tutorials, code snippets, or personal project retrospectives." 
+              required
+            ></textarea>
+          </div>
+
+          <!-- Tips Banner -->
+          <div class="p-3 mb-4 rounded-3" style="background: rgba(99, 102, 241, 0.08); border: 1px dashed rgba(99, 102, 241, 0.25);">
+            <div class="d-flex gap-2">
+              <i class="bi bi-lightbulb-fill text-warning"></i>
+              <div class="small text-secondary">
+                <strong class="text-white">Author Pro-Tip:</strong> High-impact stories begin with a clear overview of the problem, follow with actionable code or logic, and conclude with key takeaways.
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Buttons -->
+          <div class="d-flex align-items-center justify-content-between pt-2">
+            <a href="/" class="btn-secondary-custom">Cancel</a>
+            <button type="submit" class="btn-primary-custom" style="width: auto;">
+              <i class="bi bi-rocket-takeoff-fill"></i>
+              <span>Publish Story</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <%- include('./partials/script') %>
+</body>
+</html>

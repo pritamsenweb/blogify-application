@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('./partials/head') %>
+  <title>Blogify — Stories, Ideas &amp; Technical Perspectives</title>
+</head>
+<body>
+  <!-- Header / Nav -->
+  <%- include('./partials/nav') %>
+
+  <main class="app-main">
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="container">
+        <div class="hero-badge">
+          <i class="bi bi-stars"></i> Curated Developer &amp; Creator Platform
+        </div>
+        <h1 class="hero-title">
+          Where Great Ideas Find Their <span class="text-gradient">Voice.</span>
+        </h1>
+        <p class="hero-subtitle">
+          Explore engineering insights, product architecture, and insightful tutorials written by builders worldwide.
+        </p>
+
+        <!-- Live Real-Time Search Bar -->
+        <div class="search-wrapper">
+          <i class="bi bi-search search-icon"></i>
+          <input 
+            type="text" 
+            id="blogSearchInput" 
+            class="search-input" 
+            placeholder="Search stories by title, topic, or author..." 
+            autocomplete="off"
+          >
+          <span class="search-badge-count" id="searchResultCount"><%= blogs.length %> <%= blogs.length === 1 ? 'article' : 'articles' %></span>
+        </div>
+
+        <!-- Category Filter Chips -->
+        <div class="category-filter-bar">
+          <button class="category-chip active" data-category="all">All Stories</button>
+          <button class="category-chip" data-category="engineering">Engineering</button>
+          <button class="category-chip" data-category="architecture">Architecture</button>
+          <button class="category-chip" data-category="design">Design &amp; UI</button>
+          <button class="category-chip" data-category="tutorials">Tutorials</button>
+          <button class="category-chip" data-category="insights">Insights</button>
+        </div>
+
+        <!-- Tech Stack Highlights -->
+        <div class="tech-highlights">
+          <span class="tech-pill"><i class="bi bi-code-slash text-primary"></i> Node.js &amp; Express</span>
+          <span class="tech-pill"><i class="bi bi-database text-success"></i> MongoDB Mongoose</span>
+          <span class="tech-pill"><i class="bi bi-shield-check text-warning"></i> JWT Authentication</span>
+          <span class="tech-pill"><i class="bi bi-file-earmark-arrow-up text-info"></i> Multer Uploads</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="container pb-5">
+      <% if (blogs && blogs.length > 0) { %>
+        
+        <!-- Featured Hero Story (Top/Latest Article) -->
+        <% const featured = blogs[0]; %>
+        <% 
+          const featuredWords = featured.body ? featured.body.trim().split(/\s+/).length : 0;
+          const featuredReadTime = Math.max(1, Math.ceil(featuredWords / 200));
+          const featuredDate = featured.createdAt ? new Date(featured.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recently';
+          let featuredAuthorAvatar = '/profileImg/default-user.svg';
+          if (featured.createdBy && featured.createdBy.profileImagURL) {
+            featuredAuthorAvatar = featured.createdBy.profileImagURL.startsWith('.') 
+              ? featured.createdBy.profileImagURL.replace(/^\.+/, '') 
+              : featured.createdBy.profileImagURL;
+            if (!featuredAuthorAvatar.startsWith('/')) featuredAuthorAvatar = '/' + featuredAuthorAvatar;
+          }
+        %>
+        <div class="featured-card">
+          <div class="row g-0 align-items-stretch">
+            <div class="col-lg-7 featured-img-col">
+              <span class="featured-badge"><i class="bi bi-lightning-charge-fill me-1"></i> Featured Story</span>
+              <img 
+                src="<%= featured.coverImageURL || '/images/default-blog.svg' %>" 
+                alt="<%= featured.title %>" 
+                class="featured-img"
+                onerror="this.src='/images/default-blog.svg'"
+              >
+            </div>
+            <div class="col-lg-5 featured-content">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="card-tag-pill position-static">#Featured</span>
+                <span class="card-read-pill position-static"><i class="bi bi-clock"></i> <%= featuredReadTime %> min read</span>
+              </div>
+              <h2 class="featured-title">
+                <a href="/blog/<%= featured._id %>"><%= featured.title %></a>
+              </h2>
+              <p class="featured-excerpt">
+                <%= featured.body %>
+              </p>
+              
+              <div class="blog-meta-footer">
+                <div class="author-info">
+                  <img src="<%= featuredAuthorAvatar %>" alt="Author" class="author-avatar" onerror="this.src='/profileImg/default-user.svg'">
+                  <div>
+                    <div class="author-name"><%= featured.createdBy ? featured.createdBy.fullName : 'Guest Writer' %></div>
+                    <div class="post-date"><%= featuredDate %></div>
+                  </div>
+                </div>
+                <a href="/blog/<%= featured._id %>" class="read-more-btn">
+                  Read Story <i class="bi bi-arrow-right"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section Header for Grid -->
+        <div class="section-header">
+          <h2 class="section-title">
+            <i class="bi bi-grid-3x3-gap-fill"></i> All Published Stories
+          </h2>
+          <span class="text-muted small"><%= blogs.length %> total articles</span>
+        </div>
+
+        <!-- Grid of Blog Cards -->
+        <div class="blog-grid" id="blogsContainer">
+          <% 
+            const categories = ['engineering', 'architecture', 'design', 'tutorials', 'insights'];
+            blogs.forEach((blog, index) => { 
+              const wordCount = blog.body ? blog.body.trim().split(/\s+/).length : 0;
+              const readTime = Math.max(1, Math.ceil(wordCount / 200));
+              const postDate = blog.createdAt ? new Date(blog.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recently';
+              const assignedCategory = categories[index % categories.length];
+              
+              let authorAvatar = '/profileImg/default-user.svg';
+              let authorName = 'Community Writer';
+              if (blog.createdBy) {
+                authorName = blog.createdBy.fullName || authorName;
+                if (blog.createdBy.profileImagURL) {
+                  authorAvatar = blog.createdBy.profileImagURL.startsWith('.') 
+                    ? blog.createdBy.profileImagURL.replace(/^\.+/, '') 
+                    : blog.createdBy.profileImagURL;
+                  if (!authorAvatar.startsWith('/')) authorAvatar = '/' + authorAvatar;
+                }
+              }
+          %>
+            <article 
+              class="blog-card"
+              data-title="<%= blog.title %>"
+              data-body="<%= blog.body %>"
+              data-author="<%= authorName %>"
+              data-category="<%= assignedCategory %>"
+            >
+              <div class="blog-card-img-wrapper">
+                <img 
+                  src="<%= blog.coverImageURL || '/images/default-blog.svg' %>" 
+                  alt="<%= blog.title %>" 
+                  class="blog-card-img"
+                  loading="lazy"
+                  onerror="this.src='/images/default-blog.svg'"
+                >
+                <span class="card-tag-pill">#<%= assignedCategory.charAt(0).toUpperCase() + assignedCategory.slice(1) %></span>
+                <span class="card-read-pill"><i class="bi bi-clock"></i> <%= readTime %>m</span>
+              </div>
+              <div class="blog-card-body">
+                <h3 class="blog-card-title">
+                  <a href="/blog/<%= blog._id %>"><%= blog.title %></a>
+                </h3>
+                <p class="blog-card-excerpt">
+                  <%= blog.body %>
+                </p>
+                <div class="blog-meta-footer">
+                  <div class="author-info">
+                    <img src="<%= authorAvatar %>" alt="<%= authorName %>" class="author-avatar" onerror="this.src='/profileImg/default-user.svg'">
+                    <div>
+                      <div class="author-name"><%= authorName %></div>
+                      <div class="post-date"><%= postDate %></div>
+                    </div>
+                  </div>
+                  <a href="/blog/<%= blog._id %>" class="read-more-btn" aria-label="Read <%= blog.title %>">
+                    <i class="bi bi-arrow-right-circle fs-5"></i>
+                  </a>
+                </div>
+              </div>
+            </article>
+          <% }); %>
+        </div>
+
+      <% } else { %>
+        <!-- Global Zero Blogs State -->
+        <div class="empty-state">
+          <i class="bi bi-journal-x empty-icon"></i>
+          <h2 class="empty-title">No Stories Published Yet</h2>
+          <p class="empty-text">Be the founding author of this community! Create your first article and inspire fellow creators.</p>
+          <a href="/blog/add-new" class="btn-write-nav d-inline-flex">
+            <i class="bi bi-plus-lg"></i>
+            <span>Publish First Story</span>
+          </a>
+        </div>
+      <% } %>
+
+      <!-- Dynamic Live Search Empty State -->
+      <div id="searchEmptyState" class="empty-state" style="display: none;">
+        <i class="bi bi-search empty-icon"></i>
+        <h2 class="empty-title">No Matching Stories Found</h2>
+        <p class="empty-text">We couldn't find any articles matching your search criteria. Try a different search keyword or category.</p>
+        <button class="btn-secondary-custom" onclick="document.getElementById('blogSearchInput').value=''; document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active')); document.querySelector('.category-chip[data-category=\'all\']').classList.add('active'); document.getElementById('blogSearchInput').dispatchEvent(new Event('input'));">
+          Reset Filter
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Showcase Footer -->
+  <footer class="app-footer">
+    <div class="container">
+      <div class="row gy-4 align-items-center">
+        <div class="col-md-6 text-center text-md-start">
+          <div class="footer-brand">
+            <div class="brand-icon" style="width: 28px; height: 28px; font-size: 0.9rem;">
+              <i class="bi bi-feather"></i>
+            </div>
+            <span>Blogify Publication</span>
+          </div>
+          <p class="text-muted mb-2 small">
+            A production-ready full-stack publishing web application built with Node.js, Express, and MongoDB.
+          </p>
+          <div>
+            <span class="footer-badge-tech">Node.js 24</span>
+            <span class="footer-badge-tech">Express 5</span>
+            <span class="footer-badge-tech">MongoDB</span>
+            <span class="footer-badge-tech">Mongoose</span>
+            <span class="footer-badge-tech">EJS</span>
+            <span class="footer-badge-tech">JWT</span>
+            <span class="footer-badge-tech">Bootstrap 5</span>
+          </div>
+        </div>
+        <div class="col-md-6 text-center text-md-end">
+          <div class="d-flex justify-content-center justify-content-md-end gap-3 mb-2">
+            <a href="/" class="text-secondary small">Home</a>
+            <a href="/blog/add-new" class="text-secondary small">Write Story</a>
+            <a href="/user/signup" class="text-secondary small">Join Us</a>
+          </div>
+          <div class="text-muted small">
+            Crafted for GitHub showcase &bull; Open Source Project &copy; <%= new Date().getFullYear() %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <%- include('./partials/script') %>
+</body>
+</html>

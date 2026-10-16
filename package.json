@@ -1,0 +1,35 @@
+{
+  "name": "blogify-application",
+  "version": "1.0.0",
+  "description": "Blogify — Modern Full-Stack Publishing & Blogging Platform built with Node.js, Express, MongoDB, and EJS",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "seed": "node seed.js"
+  },
+  "keywords": [
+    "blog",
+    "nodejs",
+    "express",
+    "mongodb",
+    "mongoose",
+    "ejs",
+    "jwt",
+    "full-stack",
+    "bootstrap5",
+    "showcase"
+  ],
+  "author": "Pritam Sen",
+  "license": "MIT",
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "ejs": "^7.0.1",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.10.4",
+    "multer": "^2.4.0",
+    "nodemon": "^3.1.14"
+  }
+}

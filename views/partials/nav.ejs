@@ -1,0 +1,107 @@
+<nav class="navbar navbar-expand-lg navbar-custom">
+  <div class="container">
+    <!-- Brand Logo -->
+    <a class="navbar-brand brand-wrapper" href="/">
+      <div class="brand-icon">
+        <i class="bi bi-feather"></i>
+      </div>
+      <span>Blogify<span style="color: var(--accent);">.</span></span>
+    </a>
+
+    <!-- Mobile Toggler -->
+    <button class="navbar-toggler border-0 shadow-none text-light" type="button" data-bs-toggle="collapse" data-bs-target="#blogifyNav" aria-controls="blogifyNav" aria-expanded="false" aria-label="Toggle navigation">
+      <i class="bi bi-list fs-2 text-white"></i>
+    </button>
+
+    <!-- Nav Links & Actions -->
+    <div class="collapse navbar-collapse" id="blogifyNav">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="/">
+            <i class="bi bi-grid-fill"></i> Explore
+          </a>
+        </li>
+      </ul>
+
+      <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0">
+        <% if (locals.user) { %>
+          <!-- Write New Story CTA -->
+          <a href="/blog/add-new" class="btn-write-nav">
+            <i class="bi bi-pencil-square"></i>
+            <span>Write Story</span>
+          </a>
+
+          <!-- User Profile Dropdown -->
+          <div class="dropdown">
+            <% 
+              let avatarSrc = '/profileImg/default-user.svg';
+              if (locals.user.profileImagURL) {
+                avatarSrc = locals.user.profileImagURL.startsWith('.') 
+                  ? locals.user.profileImagURL.replace(/^\.+/, '') 
+                  : locals.user.profileImagURL;
+                if (!avatarSrc.startsWith('/')) avatarSrc = '/' + avatarSrc;
+              }
+            %>
+            <button class="nav-avatar-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="<%= avatarSrc %>" alt="User Avatar" class="user-avatar-img" onerror="this.src='/profileImg/default-user.svg'">
+              <span class="user-name-label d-none d-sm-inline"><%= locals.user.fullName || 'Writer' %></span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end custom-dropdown-menu">
+              <li class="px-3 py-2 border-bottom border-light mb-1">
+                <div class="fw-bold text-white small"><%= locals.user.fullName || 'Account' %></div>
+                <div class="text-muted text-truncate" style="font-size: 0.75rem;"><%= locals.user.email || '' %></div>
+                <% if (locals.user.role === 'ADMIN') { %>
+                  <span class="role-badge mt-1 d-inline-block">Admin</span>
+                <% } %>
+              </li>
+              <li>
+                <a class="dropdown-item" href="/blog/add-new">
+                  <i class="bi bi-plus-circle text-primary"></i> Create Story
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="/">
+                  <i class="bi bi-collection"></i> All Stories
+                </a>
+              </li>
+              <li><hr class="dropdown-divider border-secondary my-1"></li>
+              <li>
+                <a class="dropdown-item text-danger" href="/user/logout">
+                  <i class="bi bi-box-arrow-right"></i> Sign Out
+                </a>
+              </li>
+            </ul>
+          </div>
+        <% } else { %>
+          <!-- Guest Navigation -->
+          <a class="nav-link" href="/user/signin">
+            <i class="bi bi-box-arrow-in-right"></i> Sign In
+          </a>
+          <a class="btn-write-nav ms-1" href="/user/signup">
+            <i class="bi bi-stars"></i>
+            <span>Get Started</span>
+          </a>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Global Alert Notices -->
+<% if (locals.error) { %>
+  <div class="container mt-3">
+    <div class="alert-custom-danger" role="alert">
+      <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+      <div><%= locals.error %></div>
+    </div>
+  </div>
+<% } %>
+
+<% if (locals.success) { %>
+  <div class="container mt-3">
+    <div class="alert-custom-success" role="alert">
+      <i class="bi bi-check-circle-fill fs-5"></i>
+      <div><%= locals.success %></div>
+    </div>
+  </div>
+<% } %>

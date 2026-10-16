@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('./partials/head') %>
+  <title><%= blog.title %> — Blogify</title>
+</head>
+<body>
+  <!-- Reading Progress Bar -->
+  <div class="reading-progress-bar" id="readingProgress"></div>
+
+  <!-- Header / Navigation -->
+  <%- include('./partials/nav') %>
+
+  <main class="app-main">
+    <div class="article-container">
+      <!-- Breadcrumb navigation -->
+      <a href="/" class="back-link">
+        <i class="bi bi-arrow-left"></i>
+        <span>Back to all stories</span>
+      </a>
+
+      <!-- Article Header Meta -->
+      <% 
+        const wordCount = blog.body ? blog.body.trim().split(/\s+/).length : 0;
+        const readTime = Math.max(1, Math.ceil(wordCount / 200));
+        const postDate = blog.createdAt ? new Date(blog.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : 'Recently';
+
+        let authorAvatar = '/profileImg/default-user.svg';
+        let authorName = 'Community Writer';
+        let authorRole = 'Writer';
+        if (blog.createdBy) {
+          authorName = blog.createdBy.fullName || authorName;
+          authorRole = blog.createdBy.role || 'Writer';
+          if (blog.createdBy.profileImagURL) {
+            authorAvatar = blog.createdBy.profileImagURL.startsWith('.') 
+              ? blog.createdBy.profileImagURL.replace(/^\.+/, '') 
+              : blog.createdBy.profileImagURL;
+            if (!authorAvatar.startsWith('/')) authorAvatar = '/' + authorAvatar;
+          }
+        }
+      %>
+
+      <header class="article-header">
+        <div class="article-meta-top">
+          <span class="article-tag"><i class="bi bi-tag-fill me-1"></i> Engineering &amp; Thoughts</span>
+          <span class="article-readtime"><i class="bi bi-clock"></i> <%= readTime %> min read</span>
+          <span class="text-muted">&bull;</span>
+          <span class="article-readtime"><i class="bi bi-calendar3"></i> <%= postDate %></span>
+        </div>
+
+        <h1 class="article-main-title"><%= blog.title %></h1>
+
+        <!-- Author Bar & Share Actions -->
+        <div class="author-bar-full">
+          <div class="author-bar-left">
+            <img src="<%= authorAvatar %>" alt="<%= authorName %>" class="author-avatar-lg" onerror="this.src='/profileImg/default-user.svg'">
+            <div>
+              <div class="author-meta-name">
+                <%= authorName %>
+                <span class="role-badge"><%= authorRole %></span>
+              </div>
+              <div class="author-meta-date">Published on <%= postDate %></div>
+            </div>
+          </div>
+
+          <div class="share-group">
+            <button class="btn-share-icon" id="copyLinkBtn" title="Copy article link" aria-label="Copy Link">
+              <i class="bi bi-link-45deg"></i>
+            </button>
+            <button class="btn-share-icon" id="shareTwitterBtn" title="Share on X / Twitter" aria-label="Share on Twitter">
+              <i class="bi bi-twitter-x"></i>
+            </button>
+            <button class="btn-share-icon" id="shareLinkedinBtn" title="Share on LinkedIn" aria-label="Share on LinkedIn">
+              <i class="bi bi-linkedin"></i>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Featured Cover Image -->
+      <img 
+        src="<%= blog.coverImageURL || '/images/default-blog.svg' %>" 
+        alt="<%= blog.title %>" 
+        class="article-hero-cover"
+        onerror="this.src='/images/default-blog.svg'"
+      >
+
+      <!-- Formatted Article Content -->
+      <article class="article-body-content">
+        <% 
+          // Split content into readable paragraphs if line breaks are present
+          const paragraphs = blog.body.split(/\n+/).filter(p => p.trim().length > 0);
+          if (paragraphs.length > 0) {
+            paragraphs.forEach((pText) => { %>
+              <p><%= pText %></p>
+            <% });
+          } else { %>
+            <p><%= blog.body %></p>
+        <% } %>
+      </article>
+
+      <!-- Interactive Story Actions Bar -->
+      <div class="article-actions-bar">
+        <button class="clap-btn" id="clapBtn" data-blog-id="<%= blog._id %>">
+          <i class="bi bi-hand-thumbs-up-fill"></i>
+          <span>Appreciate</span>
+          <span id="clapCount" class="badge bg-dark rounded-pill ms-1">12</span>
+        </button>
+
+        <div class="d-flex align-items-center gap-2">
+          <% if (locals.user && blog.createdBy && (locals.user._id.toString() === blog.createdBy._id.toString() || locals.user.role === 'ADMIN')) { %>
+            <form action="/blog/delete/<%= blog._id %>" method="POST" onsubmit="return confirm('Are you sure you want to delete this story? This action cannot be undone.');">
+              <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                <i class="bi bi-trash"></i> Delete Story
+              </button>
+            </form>
+          <% } %>
+          <a href="#discussionSection" class="btn-secondary-custom btn-sm rounded-pill px-3 py-1">
+            <i class="bi bi-chat-text"></i> Discussions (<%= comment ? comment.length : 0 %>)
+          </a>
+        </div>
+      </div>
+
+      <!-- Author Spotlight Box -->
+      <div class="author-spotlight-card">
+        <img src="<%= authorAvatar %>" alt="<%= authorName %>" class="author-spotlight-avatar" onerror="this.src='/profileImg/default-user.svg'">
+        <div>
+          <div class="author-spotlight-name"><%= authorName %></div>
+          <p class="author-spotlight-bio">
+            Passionate software engineer and tech author sharing knowledge, building products, and exploring the frontiers of software development.
+          </p>
+        </div>
+      </div>
+
+      <!-- Discussion & Comments Section -->
+      <section class="comments-section" id="discussionSection">
+        <h2 class="comments-header">
+          <i class="bi bi-chat-square-dots-fill text-primary"></i>
+          <span>Discussions (<%= comment ? comment.length : 0 %>)</span>
+        </h2>
+
+        <% if (locals.user) { %>
+          <% 
+            let currentUserAvatar = '/profileImg/default-user.svg';
+            if (locals.user.profileImagURL) {
+              currentUserAvatar = locals.user.profileImagURL.startsWith('.') 
+                ? locals.user.profileImagURL.replace(/^\.+/, '') 
+                : locals.user.profileImagURL;
+              if (!currentUserAvatar.startsWith('/')) currentUserAvatar = '/' + currentUserAvatar;
+            }
+          %>
+          <!-- Add Comment Form for Logged In User -->
+          <div class="comment-input-card">
+            <form action="/blog/comment/<%= blog._id %>" method="POST">
+              <div class="d-flex gap-2 mb-2 align-items-center">
+                <img src="<%= currentUserAvatar %>" alt="You" class="comment-avatar" onerror="this.src='/profileImg/default-user.svg'">
+                <span class="small text-secondary">Commenting as <strong class="text-white"><%= locals.user.fullName || 'User' %></strong></span>
+              </div>
+              <textarea 
+                name="content" 
+                id="content" 
+                class="comment-textarea" 
+                placeholder="What are your thoughts on this story? Be respectful and constructive..." 
+                required
+              ></textarea>
+              <div class="comment-action-row">
+                <span class="text-muted small"><i class="bi bi-markdown me-1"></i> Markdown supported</span>
+                <button type="submit" class="btn-write-nav py-1 px-4 border-0">
+                  <i class="bi bi-send-fill"></i> Post Comment
+                </button>
+              </div>
+            </form>
+          </div>
+        <% } else { %>
+          <!-- Callout for Guests -->
+          <div class="auth-callout-card">
+            <i class="bi bi-chat-left-quote fs-2 text-primary mb-2 d-block"></i>
+            <h5 class="fw-bold text-white mb-1">Join the Conversation</h5>
+            <p class="text-secondary small mb-3">Sign in or create an account to share your thoughts, exchange feedback, and connect with the author.</p>
+            <div class="d-flex justify-content-center gap-2">
+              <a href="/user/signin" class="btn-secondary-custom py-1 px-3 fs-6">Sign In</a>
+              <a href="/user/signup" class="btn-write-nav py-1 px-3 fs-6">Create Account</a>
+            </div>
+          </div>
+        <% } %>
+
+        <!-- Comments List -->
+        <% if (comment && comment.length > 0) { %>
+          <div class="comments-list">
+            <% comment.forEach(item => { 
+              let cAvatar = '/profileImg/default-user.svg';
+              let cName = 'Community Reader';
+              let isAuthor = false;
+
+              if (item.createdBy) {
+                cName = item.createdBy.fullName || cName;
+                if (item.createdBy.profileImagURL) {
+                  cAvatar = item.createdBy.profileImagURL.startsWith('.') 
+                    ? item.createdBy.profileImagURL.replace(/^\.+/, '') 
+                    : item.createdBy.profileImagURL;
+                  if (!cAvatar.startsWith('/')) cAvatar = '/' + cAvatar;
+                }
+                if (blog.createdBy && blog.createdBy._id.toString() === item.createdBy._id.toString()) {
+                  isAuthor = true;
+                }
+              }
+
+              const cDate = item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recently';
+            %>
+              <div class="comment-card">
+                <div class="comment-user-row">
+                  <div class="comment-user-left">
+                    <img src="<%= cAvatar %>" alt="<%= cName %>" class="comment-avatar" onerror="this.src='/profileImg/default-user.svg'">
+                    <span class="comment-user-name"><%= cName %></span>
+                    <% if (isAuthor) { %>
+                      <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill ms-1" style="font-size: 0.7rem;">Author</span>
+                    <% } %>
+                  </div>
+                  <span class="comment-time"><%= cDate %></span>
+                </div>
+                <p class="comment-body-text"><%= item.content %></p>
+              </div>
+            <% }); %>
+          </div>
+        <% } else { %>
+          <div class="text-center py-4 text-muted small">
+            <i class="bi bi-chat-dots fs-3 d-block mb-1 opacity-50"></i>
+            No comments yet. Start the conversation by leaving a comment above!
+          </div>
+        <% } %>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Showcase Footer -->
+  <footer class="app-footer">
+    <div class="container text-center text-muted small">
+      Blogify Publication &bull; Crafted with Node.js, Express, MongoDB &amp; EJS
+    </div>
+  </footer>
+
+  <%- include('./partials/script') %>
+</body>
+</html>

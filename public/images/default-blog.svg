@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="50%" stop-color="#1e1b4b" />
+      <stop offset="100%" stop-color="#020617" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1" />
+      <stop offset="50%" stop-color="#8b5cf6" />
+      <stop offset="100%" stop-color="#ec4899" />
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="40%" r="50%">
+      <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.35" />
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0" />
+    </radialGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255, 255, 255, 0.05)" stroke-width="1" />
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)" />
+  <rect width="1200" height="630" fill="url(#glow)" />
+  <rect width="1200" height="630" fill="url(#grid)" />
+
+  <!-- Abstract Decorative Geometric Art -->
+  <g transform="translate(600, 260)">
+    <circle r="140" fill="none" stroke="url(#accent)" stroke-width="2" stroke-dasharray="12 8" opacity="0.6"/>
+    <circle r="100" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1.5" />
+    <polygon points="0,-70 60,35 -60,35" fill="none" stroke="url(#accent)" stroke-width="3" opacity="0.8"/>
+    
+    <!-- Central Icon: Document / Story -->
+    <rect x="-35" y="-45" width="70" height="90" rx="10" fill="rgba(30, 41, 59, 0.85)" stroke="url(#accent)" stroke-width="2" />
+    <line x1="-18" y1="-20" x2="18" y2="-20" stroke="#f8fafc" stroke-width="3" stroke-linecap="round" />
+    <line x1="-18" y1="-5" x2="18" y2="-5" stroke="#94a3b8" stroke-width="3" stroke-linecap="round" />
+    <line x1="-18" y1="10" x2="6" y2="10" stroke="#6366f1" stroke-width="3" stroke-linecap="round" />
+    <circle cx="16" cy="22" r="3" fill="#ec4899" />
+  </g>
+
+  <!-- Text -->
+  <text x="600" y="450" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="38" font-weight="700" fill="#f8fafc" letter-spacing="1">Blogify Publication</text>
+  <text x="600" y="490" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="400" fill="#94a3b8">Curated thoughts, software engineering &amp; digital ideas</text>
+</svg>
